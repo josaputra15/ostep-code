@@ -1,12 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <pthread.h>
-#include "common.h"
-#include "common_threads.h"
 
-int max;
-volatile int counter = 0;
 
 #define MAX_LINE	1024
 #define MAX_ARGS	50
@@ -41,8 +36,16 @@ int main(int argc, char **argv)
 static char **
 parse_args(char *cp)
 {
-	// FIXME!
-	return NULL;
+        char** s = malloc(sizeof(char*)*5); // I arbitrarily chose 5 - try with different numbers and see what happens
+        char* token = strtok(cp, " ");
+        int i = 0;
+        while(token){
+                s[i] = token;
+                token = strtok(NULL, " ");
+                i++;
+        }
+        s[i] = NULL;
+        return s;
 }
 
 /*
