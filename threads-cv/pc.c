@@ -25,14 +25,18 @@ int verbose = 1;
 
 void do_fill(int value) {
     buffer[fill_ptr] = value;
+    printf("producer: filled %d into buffer[%d]\n", value, fill_ptr);
     fill_ptr = (fill_ptr + 1) % max;
     num_full++;
+    printf("producer: num_full is now %d\n", num_full);
 }
 
 int do_get() {
     int tmp = buffer[use_ptr];
+    printf("consumer: got %d from buffer[%d]\n", tmp, use_ptr);
     use_ptr = (use_ptr + 1) % max;
     num_full--;
+    printf("consumer: num_full is now %d\n", num_full);
     return tmp;
 }
 
@@ -41,9 +45,13 @@ void *producer(void *arg) {
     for (i = 0; i < loops; i++) {
 	Mutex_lock(&m);            // p1
 	while (num_full == max)     // p2
+    printf("producer: buffer is full, waiting...\n");
 	    Cond_wait(&empty, &m); // p3
+    printf("producer: buffer has empty slot, filling...\n");
 	do_fill(i);                // p4
+    printf("producer: filled buffer, signaling...\n");
 	Cond_signal(&fill);        // p5
+    printf("producer: signaled, unlocking...\n");
 	Mutex_unlock(&m);          // p6
     }
 

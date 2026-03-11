@@ -10,7 +10,7 @@ int done = 0;
 
 void *child(void *arg) {
     printf("child\n");
-    sleep(1);
+    sleep(1); // to make it easier to see that the parent is waiting for the child to finish
     Mutex_lock(&m);
     done = 1;
     Cond_signal(&c);
@@ -23,9 +23,13 @@ int main(int argc, char *argv[]) {
     Pthread_create(&p, NULL, child, NULL);
     Mutex_lock(&m);
     while (done == 0) 
-	Cond_wait(&c, &m); // releases lock when going to sleep
+	Cond_wait(&c, &m); // releases lock m when going to sleep
     Mutex_unlock(&m);
     printf("parent: end\n");
     return 0;
 }
+
+
+// Scenario A: parent continues first and goes to sleep
+// Scenario B: child runs first before parents acquires the lock: parent never sleeps at all because done is already 1 when parent checks it, so child is done
 
